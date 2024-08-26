@@ -198,10 +198,16 @@
             font-weight: 700;
             color: #fff;
             position: absolute;
-            top: 90%;
+            top: 85%; /* Move mais para cima */
             left: 50%;
             transform: translateX(-50%);
             user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .spins-left {
+                top: 80%; /* Ajuste adicional para dispositivos móveis */
+            }
         }
 
         /* Modal Customizado */
