@@ -64,11 +64,14 @@
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
 
-const logoScale = 0.6;  // Ajuste esse valor para definir o tamanho em relação à imagem (ex.: 20%)
+const logoMaxSize = 0.2;  // Define a fração máxima do menor lado da imagem (ex.: 20%)
 
-// Define a largura do logo proporcional à imagem, mantendo a proporção original
-const logoWidth = canvas.width * logoScale;  
-const logoHeight = (leftLogo.height / leftLogo.width) * logoWidth;  // Mantém a proporção original do logo
+// Define o menor lado da imagem (largura ou altura)
+const smallerDimension = Math.min(canvas.width, canvas.height);
+
+// Calcula a largura e a altura do logo proporcionalmente, limitando pelo menor lado da imagem
+const logoWidth = smallerDimension * logoMaxSize;
+const logoHeight = (leftLogo.height / leftLogo.width) * logoWidth;  // Mantém a proporção do logo
 
                         const leftLogoX = 0;
                         const leftLogoY = canvas.height - logoHeight;
