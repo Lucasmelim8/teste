@@ -6,6 +6,61 @@
     <title>Adicionar Logo à Imagem</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #007bff;
+            padding: 10px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .canvas-container {
+            margin: 20px auto;
+            text-align: center;
+        }
+
         #canvas {
             border: 1px solid #ccc;
             margin-top: 20px;
@@ -13,34 +68,53 @@
             margin-left: auto;
             margin-right: auto;
         }
-        footer {
-            text-align: center;
-            padding: 10px;
-            margin-top: 20px;
-            font-size: 14px;
-            background-color: #f8f9fa;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            #canvas {
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Adicionar Logo à Imagem</h1>
+    <!-- Header com título e navegação -->
+    <header>
+        <div class="container">
+            <h1 class="text-center">Adicionar Logo à Imagem</h1>
+            <nav>
+                <a href="#">Home</a>
+                <a href="#">Serviços</a>
+                <a href="#">Sobre</a>
+                <a href="#">Contato</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <div class="container">
+        <h2 class="text-center mt-4">Faça upload de sua imagem e adicione logos personalizados</h2>
         <div class="form-group">
             <label for="imageUpload">Carregar Imagens:</label>
             <input type="file" id="imageUpload" class="form-control-file" accept="image/*" multiple required>
         </div>
         <button id="addLogosButton" class="btn btn-primary btn-block">Adicionar Logos e Salvar Imagem</button>
 
-        <canvas id="canvas" width="500" height="500" style="display:none;"></canvas>
+        <div class="canvas-container">
+            <canvas id="canvas" width="500" height="500" style="display:none;"></canvas>
+        </div>
     </div>
 
+    <!-- Footer com mensagem personalizada -->
     <footer>
         Feito com <span style="color: red;">S2</span> por Lucas - Versão v1.0.0
     </footer>
 
+    <!-- Scripts necessários -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
