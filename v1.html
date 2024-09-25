@@ -30,9 +30,30 @@
             text-align: center;
             padding: 10px 0;
         }
+        @keyframes slide {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            animation: slide 10s linear infinite;
+        }
     </style>
 </head>
 <body>
+
+    <header class="bg-primary text-white p-3">
+        <div class="marquee">
+            KAILLANY AMOR DA MINHA VIDA &nbsp; &nbsp; &nbsp; &nbsp;
+        </div>
+    </header>
+
     <div class="container mt-5">
         <h1 class="text-center">Logo Gelo D´água</h1>
         <div class="form-group">
@@ -43,13 +64,16 @@
 
         <canvas id="canvas" width="500" height="500" style="display:none;"></canvas>
     </div>
+    
     <footer>
         <div class="text-center">
             Feito com <span style="color: red;">❤</span> por Lucas - Versão v1.0.0
         </div>
     </footer>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
     <script>
         const imageUpload = document.getElementById('imageUpload');
