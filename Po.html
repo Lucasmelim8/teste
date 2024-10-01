@@ -195,12 +195,38 @@
          height: 100px; /* define a altura das imagens */
          }
          .modal {
-                overflow: hidden; /* Bloqueia a rolagem */
-    z-index: 50; /* ou qualquer número que seja maior que o do rating */
-}
+         overflow: hidden; /* Bloqueia a rolagem */
+         z-index: 50; /* ou qualquer número que seja maior que o do rating */
+         }
          .rating {
-    z-index: 10; /* ou um número inferior ao do modal */
-}
+         z-index: 10; /* ou um número inferior ao do modal */
+         }
+         .popup {
+         animation: slide-up 0.5s ease-in-out forwards;
+         }
+         @keyframes slide-up {
+         from {
+         transform: translateY(100%);
+         opacity: 0;
+         }
+         to {
+         transform: translateY(0);
+         opacity: 1;
+         }
+         }
+         .popup-out {
+         animation: slide-down 0.5s ease-in-out forwards;
+         }
+         @keyframes slide-down {
+         from {
+         transform: translateY(0);
+         opacity: 1;
+         }
+         to {
+         transform: translateY(100%);
+         opacity: 0;
+         }
+         }
       </style>
    </head>
    <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
@@ -212,8 +238,85 @@
          <h2 class="text-3xl font-semibold mb-2 fade-in">5 Panelas por <span class="text-red-600 font-bold">R$119,99</span></h2>
          <p class="text-gray-600 mb-6 fade-in">Aproveite esta oferta incrível e leve para casa 5 panelas de alta qualidade por apenas R$119,99! Essas panelas são perfeitas para qualquer amante da culinária e garantem resultados saborosos em suas receitas.</p>
          <div class="relative mb-6">
+            <!-- Pop-up -->
+            <div id="popup" class="popup fixed bottom-4 left-4 bg-white border border-gray-300 rounded-lg shadow-lg p-4 hidden flex flex-col">
+               <div class="flex items-center">
+                  <img id="userImage" src="" alt="Usuário" class="rounded-full mr-2" style="width: 40px; height: 40px;">
+                  <div>
+                     <p class="text-gray-800" id="userName"></p>
+                     <p class="text-gray-600" id="timeAgo"></p>
+                     <!-- Texto para exibir os segundos -->
+                  </div>
+               </div>
+               <p class="text-red-600 mt-2" id="unitMessage"></p>
+            </div>
+            <script>
+               // Lista de nomes e suas fotos (homens e mulheres)
+               const users = [
+                   { name: "João Silva", img: "https://images.pexels.com/photos/2589653/pexels-photo-2589653.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Masculino
+                   { name: "Maria Oliveira", img: "https://images.pexels.com/photos/2586341/pexels-photo-2586341.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Feminino
+                   { name: "Carlos Pereira", img: "https://images.pexels.com/photos/4048526/pexels-photo-4048526.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" }, // Masculino
+                   { name: "Ana Costa", img: "https://images.pexels.com/photos/2180908/pexels-photo-2180908.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Feminino
+                   { name: "Lucas Santos", img: "https://images.pexels.com/photos/2396040/pexels-photo-2396040.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Masculino
+                   { name: "Fernanda Almeida", img: "https://images.pexels.com/photos/2868203/pexels-photo-2868203.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" }, // Feminino
+                   { name: "Roberto Lima", img: "https://images.pexels.com/photos/2586342/pexels-photo-2586342.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Masculino
+                   { name: "Juliana Rocha", img: "https://images.pexels.com/photos/2171601/pexels-photo-2171601.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" }, // Feminino
+                   { name: "Marcos Gomes", img: "https://images.pexels.com/photos/2905828/pexels-photo-2905828.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }, // Masculino
+                   { name: "Tatiane Martins", img: "https://images.pexels.com/photos/3965249/pexels-photo-3965249.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" } // Feminino
+               ];
+               
+               // Função para obter um usuário aleatório
+               function getRandomUser() {
+                   return users[Math.floor(Math.random() * users.length)];
+               }
+               
+               // Função para obter um número aleatório entre 6 e 19
+               function getRandomSeconds() {
+                   return Math.floor(Math.random() * (19 - 6 + 1)) + 6;
+               }
+               
+               // Função para exibir o pop-up
+               function showPopup() {
+                   const popup = document.getElementById('popup');
+                   const unitMessage = document.getElementById('unitMessage');
+                   const userName = document.getElementById('userName');
+                   const userImage = document.getElementById('userImage');
+                   const timeAgo = document.getElementById('timeAgo');
+               
+                   let unitsRemaining = 17;
+               
+                   const interval = setInterval(() => {
+                       if (unitsRemaining < 7) {
+                           clearInterval(interval); // Para o intervalo quando chega a 7
+                       }
+               
+                       const randomUser = getRandomUser();
+                       const secondsAgo = getRandomSeconds();
+                       userName.innerHTML = `<strong>${randomUser.name}</strong> acabou de comprar!`; // Nome em negrito
+                       timeAgo.textContent = `${secondsAgo} segundos atrás`;
+                       unitMessage.textContent = `Restam apenas ${unitsRemaining} unidades${unitsRemaining === 7 ? '!' : ''}`; // Mensagem de unidades
+                       userImage.src = randomUser.img;
+                       popup.classList.remove('hidden');
+               
+                       // Animação de entrada
+                       popup.classList.remove('popup-out');
+                       popup.classList.add('popup');
+               
+                       // Tempo total para esconder o pop-up após 10 segundos
+                       setTimeout(() => {
+                           popup.classList.remove('popup');
+                           popup.classList.add('popup-out');
+                       }, 10000); // Pop-up visível por 10 segundos
+               
+                       unitsRemaining--; // Decrementa a quantidade de unidades restantes
+                   }, 25000); // Nova compra a cada 25 segundos
+               }
+               
+               // Mostrar o pop-up ao carregar a página
+               window.onload = showPopup;
+            </script>
             <!-- Rating -->
-<div class="absolute top-0 left-0 right-0 p-2 z-10 flex justify-end items-center fade-in rating">
+            <div class="absolute top-0 left-0 right-0 p-2 z-10 flex justify-end items-center fade-in rating">
                <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                   <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                </svg>
@@ -243,7 +346,7 @@
          Comprar Agora
          </button>
          <!-- Modal -->
-<div id="myModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden modal">
+         <div id="myModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden modal">
             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                <h2 id="modalTitle" class="text-2xl font-bold mb-4">Digite seu CEP</h2>
                <input type="text" id="cepInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="XXXXX-XXX" pattern="\d{5}-\d{3}" maxlength="10">
