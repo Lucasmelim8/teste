@@ -194,6 +194,12 @@
          .flex-container img {
          height: 100px; /* define a altura das imagens */
          }
+         .modal {
+    z-index: 50; /* ou qualquer número que seja maior que o do rating */
+}
+         .rating {
+    z-index: 10; /* ou um número inferior ao do modal */
+}
       </style>
    </head>
    <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
@@ -206,7 +212,7 @@
          <p class="text-gray-600 mb-6 fade-in">Aproveite esta oferta incrível e leve para casa 5 panelas de alta qualidade por apenas R$119,99! Essas panelas são perfeitas para qualquer amante da culinária e garantem resultados saborosos em suas receitas.</p>
          <div class="relative mb-6">
             <!-- Rating -->
-            <div class="absolute top-0 left-0 right-0 p-2 z-10 flex justify-end items-center fade-in">
+<div class="absolute top-0 left-0 right-0 p-2 z-10 flex justify-end items-center fade-in rating">
                <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                   <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                </svg>
@@ -236,7 +242,7 @@
          Comprar Agora
          </button>
          <!-- Modal -->
-         <div id="myModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+<div id="myModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden modal">
             <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                <h2 id="modalTitle" class="text-2xl font-bold mb-4">Digite seu CEP</h2>
                <input type="text" id="cepInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="XXXXX-XXX" pattern="\d{5}-\d{3}" maxlength="10">
