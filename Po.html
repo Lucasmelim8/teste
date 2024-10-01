@@ -204,19 +204,31 @@
          <h1 class="text-4xl font-bold text-green-600 mb-4 fade-in">Promoção Especial</h1>
          <h2 class="text-3xl font-semibold mb-2 fade-in">5 Panelas por <span class="text-red-600 font-bold">R$119,99</span></h2>
          <p class="text-gray-600 mb-6 fade-in">Aproveite esta oferta incrível e leve para casa 5 panelas de alta qualidade por apenas R$119,99! Essas panelas são perfeitas para qualquer amante da culinária e garantem resultados saborosos em suas receitas.</p>
-         <!-- Carrossel de Imagens -->
-         <div class="carousel mb-6 fade-in">
-            <div class="carousel-images">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu08b136.webp" alt="Panelas 1" class="rounded-lg shadow-lg">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lwhgcb1kmmyd58.webp" alt="Panelas 2" class="rounded-lg shadow-lg">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontytql02.webp" alt="Panelas 3" class="rounded-lg shadow-lg">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu5v0b19.webp" alt="Panelas 4" class="rounded-lg shadow-lg">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontt7gt7f.webp" alt="Panelas 5" class="rounded-lg shadow-lg">
-               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontum19ce.webp" alt="Panelas 6" class="rounded-lg shadow-lg">
+         <div class="relative mb-6">
+            <!-- Rating -->
+            <div class="absolute top-0 left-0 right-0 p-2 z-10 flex justify-end items-center">
+               <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                  <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+               </svg>
+               <p class="ms-2 text-sm font-bold text-black">4.95</p>
+               <!-- Mudou a cor para preto -->
+               <span class="w-1 h-1 mx-1.5 bg-gray-500 rounded-full"></span>
+               <a href="#" class="text-sm font-medium text-black underline hover:no-underline">73 Avaliações</a> <!-- Mudou a cor para preto -->
             </div>
-            <div class="carousel-buttons">
-               <button class="carousel-button" onclick="moveSlide(-1)">&#10094;</button>
-               <button class="carousel-button" onclick="moveSlide(1)">&#10095;</button>
+            <!-- Carrossel de Imagens -->
+            <div class="carousel fade-in">
+               <div class="carousel-images">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu08b136.webp" alt="Panelas 1" class="rounded-lg shadow-lg">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lwhgcb1kmmyd58.webp" alt="Panelas 2" class="rounded-lg shadow-lg">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontytql02.webp" alt="Panelas 3" class="rounded-lg shadow-lg">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu5v0b19.webp" alt="Panelas 4" class="rounded-lg shadow-lg">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontt7gt7f.webp" alt="Panelas 5" class="rounded-lg shadow-lg">
+                  <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontum19ce.webp" alt="Panelas 6" class="rounded-lg shadow-lg">
+               </div>
+               <div class="carousel-buttons">
+                  <button class="carousel-button" onclick="moveSlide(-1)">&#10094;</button>
+                  <button class="carousel-button" onclick="moveSlide(1)">&#10095;</button>
+               </div>
             </div>
          </div>
          <!-- Botão Comprar (Reposicionado) -->
@@ -525,7 +537,7 @@
          </div>
          <!-- Mensagem de avaliações -->
          <div class="flex justify-between items-center mb-2">
-            <span class="text-gray-600">Mais 27 avaliações...</span>
+            <span class="text-gray-600">Mais 59 avaliações...</span>
          </div>
          <br>
          <!-- Mensagem de aviso -->
