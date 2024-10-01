@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Promoção - 3 Panelas por R$100</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+      <style>
+         /* Estilo para o carrossel */
+         .carousel {
+         position: relative;
+         overflow: hidden;
+         }
+         .carousel-images {
+         display: flex;
+         transition: transform 0.5s ease-in-out;
+         }
+         .carousel-images img {
+         width: 100%;
+         flex: 0 0 100%;
+         transition: transform 0.3s ease;
+         height: auto; /* Mantém a proporção da imagem */
+         max-width: 600px; /* Define uma largura máxima, se necessário */
+         }
+         .carousel-images img:hover {
+         transform: scale(1.05);
+         }
+         .carousel-buttons {
+         position: absolute;
+         top: 50%;
+         transform: translateY(-50%);
+         width: 100%;
+         display: flex;
+         justify-content: space-between;
+         }
+         .carousel-button {
+         background: rgba(255, 255, 255, 0.7);
+         border: none;
+         border-radius: 50%;
+         width: 40px;
+         height: 40px;
+         cursor: pointer;
+         }
+         /* Animações */
+         .fade-in {
+         animation: fadeIn 1s ease-in forwards;
+         }
+         @keyframes fadeIn {
+         from {
+         opacity: 0;
+         }
+         to {
+         opacity: 1;
+         }
+         }
+         .accordion-button {
+         background-color: #f8f8f8;
+         }
+         .accordion-button:hover {
+         background-color: #e2e2e2;
+         }
+         .navbar-nav{
+         width: 100%;
+         }
+         @media(min-width:568px){
+         .end{
+         margin-left: auto;
+         }
+         }
+         @media(max-width:768px){
+         #post{
+         width: 100%;
+         }
+         }
+         #clicked{
+         padding-top: 1px;
+         padding-bottom: 1px;
+         text-align: center;
+         width: 100%;
+         background-color: #ecb21f;
+         border-color: #a88734 #9c7e31 #846a29;
+         color: black;
+         border-width: 1px;
+         border-style: solid;
+         border-radius: 13px; 
+         }
+         #profile{
+         background-color: unset;
+         } 
+         #post{
+         margin: 10px;
+         padding: 6px;
+         padding-top: 2px;
+         padding-bottom: 2px;
+         text-align: center;
+         background-color: #ecb21f;
+         border-color: #a88734 #9c7e31 #846a29;
+         color: black;
+         border-width: 1px;
+         border-style: solid;
+         border-radius: 13px;
+         width: 50%;
+         }
+         body{
+         background-color: black;
+         }
+         #nav-items li a,#profile{
+         text-decoration: none;
+         color: rgb(224, 219, 219);
+         background-color: black;
+         }
+         .comments{
+         margin-top: 5%;
+         margin-left: 20px;
+         }
+         .darker{
+         border: 1px solid #ecb21f;
+         background-color: black;
+         float: right;
+         border-radius: 5px;
+         padding-left: 40px;
+         padding-right: 30px;
+         padding-top: 10px;
+         }
+         .comment{
+         border: 1px solid rgba(16, 46, 46, 1);
+         background-color: rgba(16, 46, 46, 0.973);
+         float: left;
+         border-radius: 5px;
+         padding-left: 40px;
+         padding-right: 30px;
+         padding-top: 10px;
+         }
+         .comment h4,.comment span,.darker h4,.darker span{
+         display: inline;
+         }
+         .comment p,.comment span,.darker p,.darker span{
+         color: rgb(184, 183, 183);
+         }
+         h1,h4{
+         color: white;
+         font-weight: bold;
+         }
+         label{
+         color: rgb(212, 208, 208);
+         }
+         #align-form{
+         margin-top: 20px;
+         }
+         .form-group p a{
+         color: white;
+         }
+         #checkbx{
+         background-color: black;
+         }
+         #darker img{
+         margin-right: 15px;
+         position: static;
+         }
+         .form-group input,.form-group textarea{
+         background-color: black;
+         border: 1px solid rgba(16, 46, 46, 1);
+         border-radius: 12px;
+         }
+         form{
+         border: 1px solid rgba(16, 46, 46, 1);
+         background-color: rgba(16, 46, 46, 0.973);
+         border-radius: 5px;
+         padding: 20px;
+         }
+         .justify {
+         text-align: justify;
+         }
+         /* Adicione isso ao seu arquivo CSS ou dentro de uma tag 
+      <style> */
+         .fade-in {
+         animation: fadeIn 0.3s ease-in-out;
+         }
+         @keyframes fadeIn {
+         from {
+         opacity: 0;
+         }
+         to {
+         opacity: 1;
+         }
+         }
+         .flex-container {
+         display: flex;
+         justify-content: space-around; /* espaço entre as imagens */
+         }
+         .flex-container img {
+         height: 100px; /* define a altura das imagens */
+         }
+      </style>
+   </head>
+   <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+      <div class="bg-red-200 p-4 rounded-lg text-xl font-bold mb-6 text-center">
+         Promoção termina em: <span id="countdown" class="text-red-600">02:00:00</span>
+      </div>
+      <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full text-center mb-8">
+         <h1 class="text-4xl font-bold text-green-600 mb-4 fade-in">Promoção Especial</h1>
+         <h2 class="text-3xl font-semibold mb-2 fade-in">5 Panelas por <span class="text-red-600 font-bold">R$119,99</span></h2>
+         <p class="text-gray-600 mb-6 fade-in">Aproveite esta oferta incrível e leve para casa 5 panelas de alta qualidade por apenas R$119,99! Essas panelas são perfeitas para qualquer amante da culinária e garantem resultados saborosos em suas receitas.</p>
+         <!-- Carrossel de Imagens -->
+         <div class="carousel mb-6 fade-in">
+            <div class="carousel-images">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu08b136.webp" alt="Panelas 1" class="rounded-lg shadow-lg">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lwhgcb1kmmyd58.webp" alt="Panelas 2" class="rounded-lg shadow-lg">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontytql02.webp" alt="Panelas 3" class="rounded-lg shadow-lg">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozonu5v0b19.webp" alt="Panelas 4" class="rounded-lg shadow-lg">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontt7gt7f.webp" alt="Panelas 5" class="rounded-lg shadow-lg">
+               <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lrrozontum19ce.webp" alt="Panelas 6" class="rounded-lg shadow-lg">
+            </div>
+            <div class="carousel-buttons">
+               <button class="carousel-button" onclick="moveSlide(-1)">&#10094;</button>
+               <button class="carousel-button" onclick="moveSlide(1)">&#10095;</button>
+            </div>
+         </div>
+         <!-- Botão Comprar (Reposicionado) -->
+         <button id="openModal" class="bg-green-600 text-white py-2 px-4 rounded-lg text-lg hover:bg-green-500 transition-colors duration-300 mb-6 fade-in">
+         Comprar Agora
+         </button>
+         <!-- Modal -->
+         <div id="myModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+               <h2 id="modalTitle" class="text-2xl font-bold mb-4">Digite seu CEP</h2>
+               <input type="text" id="cepInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="XXXXX-XXX" pattern="\d{5}-\d{3}" maxlength="10">
+               <div id="freteMessage" class="text-green-600 font-bold hidden">FRETE GRÁTIS!</div>
+               <!-- Campos Adicionais -->
+               <div id="additionalFields" class="hidden">
+                  <select id="estadoInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" required>
+                     <option value="" disabled selected>Estado</option>
+                     <option value="AC">Acre (AC)</option>
+                     <option value="AL">Alagoas (AL)</option>
+                     <option value="AP">Amapá (AP)</option>
+                     <option value="AM">Amazonas (AM)</option>
+                     <option value="BA">Bahia (BA)</option>
+                     <option value="CE">Ceará (CE)</option>
+                     <option value="DF">Distrito Federal (DF)</option>
+                     <option value="ES">Espírito Santo (ES)</option>
+                     <option value="GO">Goiás (GO)</option>
+                     <option value="MA">Maranhão (MA)</option>
+                     <option value="MT">Mato Grosso (MT)</option>
+                     <option value="MS">Mato Grosso do Sul (MS)</option>
+                     <option value="MG">Minas Gerais (MG)</option>
+                     <option value="PA">Pará (PA)</option>
+                     <option value="PB">Paraíba (PB)</option>
+                     <option value="PR">Paraná (PR)</option>
+                     <option value="PE">Pernambuco (PE)</option>
+                     <option value="PI">Piauí (PI)</option>
+                     <option value="RJ">Rio de Janeiro (RJ)</option>
+                     <option value="RN">Rio Grande do Norte (RN)</option>
+                     <option value="RS">Rio Grande do Sul (RS)</option>
+                     <option value="RO">Rondônia (RO)</option>
+                     <option value="RR">Roraima (RR)</option>
+                     <option value="SC">Santa Catarina (SC)</option>
+                     <option value="SP">São Paulo (SP)</option>
+                     <option value="SE">Sergipe (SE)</option>
+                     <option value="TO">Tocantins (TO)</option>
+                  </select>
+                  <input type="text" id="cidadeInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="Cidade" required>
+                  <input type="text" id="ruaInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="Rua" required>
+                  <input type="text" id="numeroInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="Número" required>
+                  <input type="email" id="emailInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="Seu E-mail" required>
+                  <input type="tel" id="phoneInput" class="border border-gray-300 rounded-lg p-2 mb-4 w-full" placeholder="Seu Telefone" required>
+               </div>
+               <div class="flex justify-end">
+                  <button id="closeModal" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg mr-2">Cancelar</button>
+                  <button id="checkCep" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500 transition-colors duration-300">Continuar</button>
+               </div>
+            </div>
+         </div>
+         <script>
+            // Máscara para o campo do CEP
+            function applyCepMask(event) {
+                const value = event.target.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                const formattedValue = value.replace(/(\d{5})(\d)/, '$1-$2'); // Adiciona o hífen
+            
+                event.target.value = formattedValue; // Define o valor formatado
+            }
+            
+            // Função para verificar o CEP e liberar campos adicionais
+            function checkCep() {
+                const cepValue = cepInput.value;
+            
+                // Aqui você pode adicionar a lógica para verificar se o CEP existe
+                // Simulando verificação de CEP
+                setTimeout(() => {
+                    if (cepValue) { // Supondo que o CEP é válido
+                        document.getElementById('freteMessage').classList.remove('hidden');
+                        document.getElementById('additionalFields').classList.remove('hidden');
+                        document.getElementById('modalTitle').innerText = 'Preencha seus dados'; // Alterar título
+                        document.getElementById('checkCep').innerText = 'Continuar'; // Alterar texto do botão para "Continuar"
+                    }
+                }, 200); // Simulando um atraso de 2 segundos
+            }
+            
+            // Função para continuar e mostrar loader antes de preencher os dados do endereço
+            function continueWithPayment() {
+                const estadoInput = document.getElementById('estadoInput').value;
+                const cidadeInput = document.getElementById('cidadeInput').value;
+                const ruaInput = document.getElementById('ruaInput').value;
+                const numeroInput = document.getElementById('numeroInput').value;
+                const emailInput = document.getElementById('emailInput').value;
+                const phoneInput = document.getElementById('phoneInput').value;
+            
+                // Verificar se todos os campos estão preenchidos
+                if (estadoInput && cidadeInput && ruaInput && numeroInput && emailInput && phoneInput) {
+                    const modal = document.getElementById('myModal');
+            
+                    // Remover conteúdo antigo
+                    modal.querySelector('.bg-white').innerHTML = '';
+            
+                    // Adicionar loader
+                    const loaderContent = `
+                        <div class="flex justify-center items-center mt-4">
+                            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-600"></div>
+                        </div>
+                        <div class="text-center mt-2">Carregando...</div>
+                    `;
+                    modal.querySelector('.bg-white').innerHTML = loaderContent;
+            
+                    // Esperar 2 segundos antes de alterar para a tela de pagamento
+                    setTimeout(() => {
+                        // Alterar conteúdo do modal para tela de pagamento
+                        const paymentContent = `
+            <h2 class="text-2xl font-bold mb-4">Pagamento</h2>
+            <div class="flex flex-col items-center mt-4">
+                <div>
+                    <img src="link-do-seu-qrcode-aqui" alt="QRCODE PIX" />
+                    <div class="flex items-center mt-2">
+                        <span>código pix</span>
+                        <button onclick="copyCode()" class="ml-2 bg-blue-600 text-white py-1 px-3 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200">
+                            Copiar
+                        </button> <!-- Botão Copiar -->
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <span>Valor a ser pago: R$ 100,00</span> <!-- Valor a ser pago -->
+                </div>
+                <div class="flex items-center mt-2">
+                    <span>Status: Aguardando...</span>
+                    <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-600 ml-2"></div> <!-- Mini loader -->
+                </div>
+            </div>
+            
+            
+                        `;
+                        modal.querySelector('.bg-white').innerHTML = paymentContent;
+                    }, 2000);
+                } else {
+                    alert("Por favor, preencha todos os campos do endereço antes de continuar."); // Alertar se algum campo estiver vazio
+                }
+            }
+            
+            const cepInput = document.getElementById('cepInput');
+            cepInput.addEventListener('input', applyCepMask);
+            
+            const checkCepButton = document.getElementById('checkCep');
+            checkCepButton.addEventListener('click', checkCep);
+            
+            // Função para abrir o modal
+            document.getElementById('openModal').onclick = function() {
+                document.getElementById('myModal').classList.remove('hidden');
+            };
+            
+            // Função para fechar o modal
+            document.getElementById('closeModal').onclick = function() {
+                document.getElementById('myModal').classList.add('hidden');
+            };
+            
+            // Função para continuar
+            document.getElementById('checkCep').onclick = function() {
+                const additionalFields = document.getElementById('additionalFields');
+                if (additionalFields.classList.contains('hidden')) {
+                    checkCep();
+                } else {
+                    continueWithPayment();
+                }
+            };
+         </script>
+         <!-- Descrição Detalhada com Ícones -->
+         <h3 class="text-2xl font-bold text-center mb-6 fade-in">Detalhes do Produto</h3>
+         <ul class="list-none text-left mb-6 fade-in space-y-4">
+            <li class="flex items-center text-gray-700 justify">
+               <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+               </svg>
+               Material: Aço inoxidável, garante durabilidade e resistência à corrosão.
+            </li>
+            <li class="flex items-center text-gray-700 justify">
+               <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+               </svg>
+               Tamanhos: 20cm, 24cm, 26cm, 28cm e 30cm, adequadas para diversas receitas.
+            </li>
+            <li class="flex items-center text-gray-700 justify">
+               <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+               </svg>
+               Revestimento antiaderente, facilitando o cozimento e a limpeza.
+            </li>
+            <li class="flex items-center text-gray-700 justify">
+               <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+               </svg>
+               Compatível com todos os tipos de fogão, incluindo indução.
+            </li>
+            <li class="flex items-center text-gray-700 justify">
+               <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+               </svg>
+               Design moderno e elegante que combina com qualquer cozinha.
+            </li>
+         </ul>
+         <!-- Benefícios -->
+         <h3 class="text-2xl font-bold text-center mb-8 fade-in">Benefícios</h3>
+         <div class="flex justify-around mb-6 fade-in">
+            <div class="text-center">
+               <img src="https://cdn-icons-png.freepik.com/512/4072/4072073.png?ga=GA1.1.156581024.1727792475" alt="Fácil Limpeza" class="h-12 w-12 mx-auto mb-2">
+               <p class="font-semibold">Fácil Limpeza</p>
+            </div>
+            <div class="text-center">
+               <img src="https://cdn-icons-png.freepik.com/512/4072/4072133.png?ga=GA1.1.156581024.1727792475" alt="Fácil Limpeza" class="h-12 w-12 mx-auto mb-2">
+               <p class="font-semibold">Durabilidade</p>
+            </div>
+            <div class="text-center">
+               <img src="https://cdn-icons-png.freepik.com/512/4072/4072188.png?ga=GA1.1.156581024.1727792475" alt="Fácil Limpeza" class="h-12 w-12 mx-auto mb-2">
+               <p class="font-semibold">Design Moderno</p>
+            </div>
+         </div>
+         <!-- Avaliações -->
+         <h3 class="text-2xl font-bold text-center mb-8 fade-in">Avaliações</h3>
+         <!-- Avaliação 1 -->
+         <div class="space-y-8 fade-in">
+            <div class="flex items-start p-4 border border-gray-300 rounded-lg">
+               <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkAJEkJQ1WumU0hXNpXdgBt9NUKc0QDVIiaw&s" alt="Foto do Usuário" class="w-12 h-12 rounded-full mr-4">
+               <div class="flex-1">
+                  <div class="flex justify-between items-center mb-2">
+                     <h3 class="font-semibold text-gray-800">João Miranda</h3>
+                     <span class="text-gray-500">01/10/2024</span> <!-- Data abaixo do nome -->
+                     <div class="flex items-center">
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                     </div>
+                  </div>
+                  <p class="mt-2 text-gray-700 justify">Este produto é simplesmente incrível! A qualidade é excelente e atendeu todas as minhas expectativas. Recomendo a todos.</p>
+               </div>
+            </div>
+         </div>
+         <br>
+         <!-- Avaliação 2 -->
+         <div class="space-y-8 fade-in">
+            <div class="flex items-start p-4 border border-gray-300 rounded-lg">
+               <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhDS5fdnAvF-T2B78wT9y33XCKQl9HjBg8Sg&s" alt="Foto do Usuário" class="w-12 h-12 rounded-full mr-4">
+               <div class="flex-1">
+                  <div class="flex justify-between items-center mb-2">
+                     <h3 class="font-semibold text-gray-800">Maria Oliveira</h3>
+                     <span class="text-gray-500">01/10/2024</span> <!-- Data abaixo do nome -->
+                     <div class="flex items-center">
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                     </div>
+                  </div>
+                  <p class="mt-2 text-gray-700 justify">Essas panelas são incríveis! Cozinham uniformemente e são super fáceis de limpar. Estou muito satisfeita com a compra!</p>
+               </div>
+            </div>
+         </div>
+         <br>
+         <!-- Avaliação 3 -->
+         <div class="space-y-8 fade-in">
+            <div class="flex items-start p-4 border border-gray-300 rounded-lg">
+               <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfpaqlqUcm6j8cab-eXaFSquJdwuQNRPr0wA&s" alt="Foto do Usuário" class="w-12 h-12 rounded-full mr-4">
+               <div class="flex-1">
+                  <div class="flex justify-between items-center mb-2">
+                     <h3 class="font-semibold text-gray-800">Carlos Silva</h3>
+                     <span class="text-gray-500">01/10/2024</span> <!-- Data abaixo do nome -->
+                     <div class="flex items-center">
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                           <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                     </div>
+                  </div>
+                  <p class="mt-2 text-gray-700 justify">Excelentes panelas, eu uso todos os dias. A qualidade é nota 10 e o preço é imbatível! Recomendo para todos.</p>
+               </div>
+            </div>
+         </div>
+         <!-- Mensagem de avaliações -->
+         <div class="flex justify-between items-center mb-2">
+            <span class="text-gray-600">Mais 27 avaliações...</span>
+         </div>
+         <br>
+         <!-- Mensagem de aviso -->
+         <div class="flex items-center p-4 border border-gray-300 rounded-lg mb-4">
+            <span class="text-gray-600">Você deve estar logado para comentar.</span>
+         </div>
+         </section>
+         </section>
+         </main>
+         <!-- Perguntas Frequentes -->
+         <section class="max-w-4xl mx-auto py-12">
+            <h2 class="text-2xl font-bold text-center mb-8 fade-in">Perguntas Frequentes</h2>
+            <div id="faq-accordion" class="space-y-4 fade-in">
+               <div class="border border-gray-300 rounded-lg">
+                  <h3>
+                     <button type="button" class="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-accordion-target="#faq1" aria-expanded="false" aria-controls="faq1">
+                        <span class="font-medium text-gray-700">Quem somos?</span>
+                        <svg class="w-5 h-5 transition-transform duration-200" data-accordion-icon aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                        </svg>
+                     </button>
+                  </h3>
+                  <div id="faq1" class="hidden p-4 border-t border-gray-200">
+                     <p class="text-gray-600 justify">Desde a nossa fundação, há 23 anos, a Panelas JRB tem se dedicado a oferecer produtos de alta qualidade e confiabilidade para o mercado de atacado de panelas. Com uma ampla gama de utensílios de cozinha, nossas panelas são projetadas para atender tanto os chefs profissionais quanto os cozinheiros caseiros, sempre com foco na durabilidade e desempenho.</p>
+                  </div>
+               </div>
+               <div class="border border-gray-300 rounded-lg">
+                  <h3>
+                     <button type="button" class="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-accordion-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                        <span class="font-medium text-gray-700">Como posso entrar em contato?</span>
+                        <svg class="w-5 h-5 transition-transform duration-200" data-accordion-icon aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                        </svg>
+                     </button>
+                  </h3>
+                  <div id="faq2" class="hidden p-4 border-t border-gray-200">
+                     <p class="text-gray-600 justify">Você pode entrar em contato conosco através do nosso e-mail suporte@exemplo.com ou pelo nosso Instagram @seu_perfil_instagram.</p>
+                  </div>
+               </div>
+               <div class="border border-gray-300 rounded-lg">
+                  <h3>
+                     <button type="button" class="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-accordion-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                        <span class="font-medium text-gray-700">Quais são os métodos de pagamento aceitos?</span>
+                        <svg class="w-5 h-5 transition-transform duration-200" data-accordion-icon aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                        </svg>
+                     </button>
+                  </h3>
+                  <div id="faq3" class="hidden p-4 border-t border-gray-200">
+                     <p class="text-gray-600 justify">Oferecemos uma forma de pagamento rápida e segura: PIX. Ao escolher essa opção, você poderá realizar sua compra de maneira prática, com transferência instantânea e sem complicações.</p>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- Políticas de Envio e Devolução -->
+         <h3 class="text-2xl font-bold text-center mb-8 fade-in">Políticas de Envio e Devolução</h3>
+         <p class="text-gray-600 mb-2 fade-in justify">Oferecemos envio rápido para todo o Brasil e aceitamos devoluções em até 30 dias após a compra, desde que o produto esteja em sua embalagem original.</p>
+      </div>
+      <!-- Rodapé -->
+      <footer class="py-4">
+         <div class="container mx-auto text-center">
+            <p class="text-sm">&copy; 2024 Panelas JRB. Todos os direitos reservados.</p>
+            <div class="flex-container">
+               <img src="https://public-resources.zordcdn.com.br/assets/global/footer/selo-google.svg" alt="Seu pedido com Segurança" title="Site Seguro" style="margin-top: 10px; margin-bottom: 20px;">
+               <img src="https://public-resources.zordcdn.com.br/assets/global/footer/procon.svg" alt="Seu pedido com Segurança" title="Site Seguro" style="height: 65px; margin-top: 20px; "> <!-- Altera a margem superior -->
+            </div>
+         </div>
+      </footer>
+      <script>
+         // Carrossel de Imagens
+         let currentIndex = 0;
+         
+         function moveSlide(direction) {
+             const slides = document.querySelectorAll('.carousel-images img');
+             currentIndex += direction;
+             if (currentIndex < 0) {
+                 currentIndex = slides.length - 1;
+             } else if (currentIndex >= slides.length) {
+                 currentIndex = 0;
+             }
+             updateSlidePosition();
+         }
+         
+         function updateSlidePosition() {
+             const slideContainer = document.querySelector('.carousel-images');
+             const offset = -currentIndex * 100; // 100% para exibir a próxima imagem
+             slideContainer.style.transform = `translateX(${offset}%)`;
+         }
+         
+         // Contagem Regressiva
+         let countdownDuration = 895; // 2 horas em segundos
+         const countdownElement = document.getElementById('countdown');
+         
+         function startCountdown() {
+             const interval = setInterval(() => {
+                 countdownDuration--;
+                 const hours = Math.floor(countdownDuration / 3600);
+                 const minutes = Math.floor((countdownDuration % 3600) / 60);
+                 const seconds = countdownDuration % 60;
+         
+                 countdownElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+         
+                 if (countdownDuration <= 0) {
+                     clearInterval(interval);
+                     countdownElement.textContent = "Promoção Encerrada";
+                 }
+             }, 1000);
+         }
+         
+         startCountdown();
+         
+         
+         document.querySelectorAll('[data-accordion-target]').forEach(button => {
+         button.addEventListener('click', () => {
+         const targetId = button.getAttribute('data-accordion-target');
+         const content = document.querySelector(targetId);
+         const isExpanded = button.getAttribute('aria-expanded') === 'true';
+         
+         // Toggle the accordion content
+         content.classList.toggle('hidden', isExpanded);
+         button.setAttribute('aria-expanded', !isExpanded);
+         });
+         });
+         function copyCode() {
+         const codePix = "seu_codigo_pix_aqui"; // Substitua pelo código real que você deseja copiar
+         navigator.clipboard.writeText(codePix).then(() => {
+         alert("Código copiado para a área de transferência!"); // Mensagem opcional de confirmação
+         }).catch(err => {
+         console.error("Erro ao copiar o código: ", err);
+         });
+         }
+         
+         
+      </script>
+   </body>
+</html>
