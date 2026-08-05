@@ -1,1 +1,832 @@
-xottt
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trilha do Investidor Iniciante</title>
+    
+    <!-- Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- React e ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel para compilar o código JSX no navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Supabase (Banco de Dados) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans pb-20">
+    
+    <!-- Container onde o React vai renderizar o site -->
+    <div id="root"></div>
+
+    <!-- Código da Aplicação (React + JSX) -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        let supabase = null;
+        const supabaseUrl = 'https://lfrmsfecobosdwiczeal.supabase.co';
+        const supabaseKey = 'sb_publishable_2bdpGcmpWxvkqyEmDtOK4g_dkm6ro9S';
+
+        // Gera um ID de usuário anônimo no localStorage
+        const getOrCreateUserId = () => {
+          let userId = localStorage.getItem('investidor_user_id');
+          if (!userId) {
+            userId = crypto.randomUUID();
+            localStorage.setItem('investidor_user_id', userId);
+          }
+          return userId;
+        };
+        const USER_ID = getOrCreateUserId();
+
+        const COURSE_DATA = {
+          weeks: [
+            {
+              id: 1,
+              title: "Semana 1 — Fundamentos",
+              objective: "Objetivo: entender como o dinheiro funciona.",
+              days: [
+                { 
+                  id: 1, 
+                  title: "Indicadores Econômicos Básicos", 
+                  topics: ["O que é inflação.", "O que é CDI.", "O que é Selic.", "O que é IPCA."],
+                  quiz: [
+                    { id: 'q1', type: 'select', question: 'Qual é a taxa básica de juros da economia brasileira?', options: ['CDI', 'IPCA', 'Selic', 'TR'] },
+                    { id: 'q2', type: 'text', question: 'Explique com suas palavras o que é inflação.' }
+                  ]
+                },
+                { 
+                  id: 2, 
+                  title: "A Mágica dos Juros", 
+                  topics: ["Juros compostos.", "Valor presente.", "Valor futuro.", "Poder dos juros."],
+                  exercise: "Faça exercícios práticos de juros compostos em uma calculadora online.",
+                  quiz: [
+                    { id: 'q3', type: 'select', question: 'Qual modelo faz seu dinheiro crescer mais rápido no longo prazo?', options: ['Juros Simples', 'Juros Compostos'] }
+                  ]
+                },
+                { 
+                  id: 3, 
+                  title: "O Tripé dos Investimentos", 
+                  topics: ["Risco.", "Retorno.", "Liquidez."],
+                  note: "Entenda por que os três sempre andam juntos. Você nunca terá alto retorno, baixo risco e alta liquidez ao mesmo tempo."
+                },
+                { 
+                  id: 4, 
+                  title: "Sistema Financeiro Brasileiro", 
+                  topics: ["Banco Central", "Tesouro Nacional", "B3", "Bancos", "Corretoras"],
+                  intro: "Aprenda como as instituições se conectam:"
+                },
+                { 
+                  id: 5, 
+                  title: "A Mecânica do Investimento", 
+                  topics: [],
+                  note: "Fluxo: Você → Corretora → Mercado → Ativo."
+                },
+                { 
+                  id: 6, 
+                  title: "Impostos", 
+                  topics: ["IOF", "IR", "Come-cotas", "Isenção"],
+                  intro: "Aprenda sobre os principais descontos:"
+                },
+                { 
+                  id: 7, 
+                  title: "Revisão da Semana 1", 
+                  topics: ["Revisão completa dos conceitos aprendidos."],
+                  note: "Tire o dia para reler suas anotações e garantir que entendeu o vocabulário básico."
+                }
+              ]
+            },
+            {
+              id: 2,
+              title: "Semana 2 — Renda Fixa",
+              objective: "Agora você aprende onde a maioria das pessoas investe.",
+              days: [
+                { id: 8, title: "Tesouro Selic", topics: ["Aprenda tudo sobre o investimento mais seguro do país."] },
+                { 
+                  id: 9, 
+                  title: "Tesouro IPCA", 
+                  topics: ["Marcação a mercado.", "Por que sobe.", "Por que cai."],
+                  note: "Cuidado: Renda fixa também pode dar prejuízo se você não entender a marcação a mercado e resgatar antes do prazo."
+                },
+                { id: 10, title: "Tesouro Prefixado", topics: ["Quando vale a pena investir com taxa travada."] },
+                { id: 11, title: "CDB (Certificado de Depósito Bancário)", topics: ["O que é CDI", "O que significa % do CDI", "FGC (Fundo Garantidor de Créditos)", "Liquidez"] },
+                { 
+                  id: 12, 
+                  title: "Crédito Privado e Isenções", 
+                  topics: ["LCI", "LCA", "CRI", "CRA", "Debêntures"],
+                  note: "Entenda por que alguns desses investimentos são isentos de Imposto de Renda."
+                },
+                { 
+                  id: 13, 
+                  title: "Análise Comparativa", 
+                  topics: ["Como comparar dois investimentos."],
+                  exercise: "Exemplo prático: Compare a rentabilidade líquida de um Tesouro vs CDB vs LCI."
+                },
+                { 
+                  id: 14, 
+                  title: "Mão na Massa: Carteira Conservadora", 
+                  topics: ["Monte sua primeira carteira apenas com renda fixa."],
+                  exercise: "Simule a distribuição de R$ 10.000 entre os ativos estudados nesta semana."
+                }
+              ]
+            },
+            {
+              id: 3,
+              title: "Semana 3 — Bolsa de Valores",
+              objective: "Agora começa a parte divertida: Renda Variável.",
+              days: [
+                { id: 15, title: "Fundamentos das Ações", topics: ["O que é uma ação na prática."] },
+                { 
+                  id: 16, 
+                  title: "A Engrenagem das Empresas", 
+                  topics: ["Receita", "Lucro", "Fluxo de Caixa"],
+                  intro: "Como uma empresa ganha dinheiro:"
+                },
+                { id: 17, title: "Indicadores Fundamentalistas", topics: ["P/L (Preço/Lucro)", "P/VP (Preço/Valor Patrimonial)", "ROE (Retorno sobre Patrimônio)", "Margem", "Dividend Yield"] },
+                { id: 18, title: "Remuneração ao Acionista", topics: ["Dividendos", "JCP (Juros sobre Capital Próprio)", "Crescimento (Valorização da cota)"] },
+                { 
+                  id: 19, 
+                  title: "Análise Prática", 
+                  topics: ["Como analisar uma empresa."],
+                  exercise: "Leia um balanço simples de uma empresa de capital aberto."
+                },
+                { 
+                  id: 20, 
+                  title: "ETFs (Fundos de Índice)", 
+                  topics: ["IVVB11", "SPXI11", "WRLD11", "BOVA11"],
+                  intro: "Aprenda a investir em blocos de ações:"
+                },
+                { 
+                  id: 21, 
+                  title: "FIIs (Fundos Imobiliários)", 
+                  topics: ["Tipos (Tijolo, Papel, Fiagro)", "Dividendos mensais", "Vacância"],
+                  note: "Como receber aluguéis sem precisar comprar um imóvel inteiro."
+                }
+              ]
+            },
+            {
+              id: 4,
+              title: "Semana 4 — Investidor Avançado",
+              objective: "Agora junta tudo e crie sua estratégia.",
+              days: [
+                { id: 22, title: "A Arte de Não Perder Tudo", topics: ["Diversificação de verdade (não apenas comprar 10 coisas iguais)."] },
+                { id: 23, title: "Estratégia de Portfólio", topics: ["Alocação de ativos (Asset Allocation)."] },
+                { id: 24, title: "Manutenção da Carteira", topics: ["Rebalanceamento: comprando na baixa e vendendo na alta de forma automática."] },
+                { 
+                  id: 25, 
+                  title: "Investimentos Internacionais", 
+                  topics: ["S&P 500", "Nasdaq", "MSCI World", "Dólar"],
+                  note: "Por que você não deve ter 100% do seu patrimônio exposto apenas ao R$."
+                },
+                { id: 26, title: "Eficiência", topics: ["Planejamento tributário (pagando menos impostos de forma legal)."] },
+                { id: 27, title: "Visão de Longo Prazo", topics: ["Como montar uma carteira para 30 anos."] },
+                { id: 28, title: "Prevenção", topics: ["Erros mais comuns dos investidores iniciantes (e como evitá-los)."] },
+                { 
+                  id: 29, 
+                  title: "Laboratório de Análise", 
+                  topics: ["Tesouro", "CDB", "ETF", "Fundo", "Ação"],
+                  exercise: "Analise 20 investimentos reais. Explique para si mesmo por que compraria ou não cada um."
+                },
+                { 
+                  id: 30, 
+                  title: "Formatura", 
+                  topics: ["Monte sua carteira definitiva."],
+                  exercise: "Justifique cada investimento escolhido e escreva sua tese de investimentos."
+                }
+              ]
+            }
+          ],
+          routine: [
+            "Leia uma notícia econômica.", "Veja a Selic atual.", "Veja o CDI atual.", 
+            "Veja o valor do dólar.", "Veja o IFIX.", "Veja o Ibovespa.", "Veja o S&P 500."
+          ],
+          books: [
+            { title: "Psicologia Financeira", author: "Morgan Housel" },
+            { title: "O Investidor Inteligente", author: "Benjamin Graham" },
+            { title: "O Jeito Warren Buffett de Investir", author: "Robert G. Hagstrom" }
+          ],
+          challenge: "Se você realmente dedicar 2 a 3 horas por dia, ao final de 30 dias conseguirá conversar com tranquilidade sobre: Tesouro Direto, CDBs, Ações, ETFs, FIIs, Investimentos internacionais, Juros, Inflação, Risco e Alocação de ativos."
+        };
+
+        const Header = ({ completedCount, totalCount, onOpenUpload }) => {
+          const progressPercentage = Math.round((completedCount / totalCount) * 100);
+
+          return (
+            <header className="bg-emerald-900 text-white p-6 md:p-8 rounded-b-2xl shadow-lg mb-8">
+              <div className="max-w-5xl mx-auto">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <h1 className="text-3xl font-bold flex items-center gap-3">
+                      <i className="fa-solid fa-arrow-trend-up text-emerald-400"></i>
+                      Do Zero ao Investidor
+                    </h1>
+                    <p className="text-emerald-100 mt-2 text-lg">Seu plano de 30 dias para dominar as finanças.</p>
+                  </div>
+                  
+                  <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                    <button 
+                      onClick={onOpenUpload}
+                      className="w-full md:w-auto flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-4 py-3 rounded-xl transition-colors font-medium border border-emerald-700/50 shadow-sm"
+                    >
+                      <i className="fa-solid fa-video text-lg"></i>
+                      Adicionar Vídeo
+                      <i className="fa-solid fa-plus text-sm ml-1"></i>
+                    </button>
+
+                    <div className="w-full md:w-64 bg-emerald-800 rounded-xl p-4 shadow-inner">
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-medium text-emerald-200">Seu Progresso</span>
+                        <span className="text-2xl font-bold">{progressPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-emerald-950 rounded-full h-3">
+                        <div 
+                          className="bg-emerald-400 h-3 rounded-full transition-all duration-500 ease-out" 
+                          style={{ width: `${progressPercentage}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-emerald-300 mt-2 text-right">
+                        {completedCount} de {totalCount} dias concluídos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
+          );
+        };
+
+        const VideoUploadModal = ({ isOpen, onClose, onSave }) => {
+          const [dayId, setDayId] = useState(1);
+          const [title, setTitle] = useState('');
+          const [url, setUrl] = useState('');
+          const [isSubmitting, setIsSubmitting] = useState(false);
+
+          if (!isOpen) return null;
+
+          const handleSubmit = async (e) => {
+            e.preventDefault();
+            setIsSubmitting(true);
+            await onSave({ day_id: parseInt(dayId), title, url });
+            setIsSubmitting(false);
+            setTitle('');
+            setUrl('');
+          };
+
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i className="fa-solid fa-video text-emerald-600"></i>
+                    Adicionar Novo Vídeo
+                  </h3>
+                  <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i className="fa-solid fa-xmark text-xl"></i>
+                  </button>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Dia do Curso</label>
+                    <select 
+                      value={dayId} 
+                      onChange={(e) => setDayId(e.target.value)}
+                      className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white outline-none"
+                      required
+                    >
+                      {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
+                        <option key={day} value={day}>Dia {day}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Título do Vídeo</label>
+                    <input 
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Ex: Entendendo a Selic"
+                      className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Link do YouTube</label>
+                    <input 
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://youtube.com/watch?v=..."
+                      className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="pt-4 flex justify-end gap-3">
+                    <button 
+                      type="button" 
+                      onClick={onClose}
+                      className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Salvando...' : 'Salvar Vídeo'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        };
+
+        const DayCard = ({ day, isCompleted, onToggleComplete, isExpanded, onToggleExpand, notes, onSaveNotes, savedAnswers, isSupabaseReady, videos, completedVideoIds, onToggleVideo }) => {
+          const [localNotes, setLocalNotes] = useState({ understanding: '', doubts: '' });
+          const [localAnswers, setLocalAnswers] = useState({});
+          const [isSaving, setIsSaving] = useState(false);
+
+          useEffect(() => {
+            if (notes) setLocalNotes({ understanding: notes.understanding || '', doubts: notes.doubts || '' });
+            if (savedAnswers) setLocalAnswers(savedAnswers);
+          }, [notes, savedAnswers]);
+
+          const handleSave = async () => {
+            if (!isSupabaseReady) {
+               alert("Banco de dados carregando, por favor aguarde um momento.");
+               return;
+            }
+            setIsSaving(true);
+            await onSaveNotes(localNotes, localAnswers);
+            setIsSaving(false);
+          };
+
+          return (
+            <div className={`border rounded-xl mb-4 overflow-hidden transition-all duration-300 ${isCompleted ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-white shadow-sm'}`}>
+              
+              <div 
+                className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+                onClick={onToggleExpand}
+              >
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onToggleComplete(); }}
+                    className={`flex-shrink-0 transition-colors text-2xl ${isCompleted ? 'text-emerald-500 hover:text-emerald-600' : 'text-slate-300 hover:text-emerald-400'}`}
+                  >
+                    {isCompleted ? <i className="fa-solid fa-circle-check"></i> : <i className="fa-regular fa-circle"></i>}
+                  </button>
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Dia {day.id}</span>
+                    <h3 className={`text-lg font-semibold ${isCompleted ? 'text-emerald-900 line-through opacity-70' : 'text-slate-800'}`}>
+                      {day.title}
+                    </h3>
+                  </div>
+                </div>
+                <div className="text-slate-400">
+                  {isExpanded ? <i className="fa-solid fa-chevron-up"></i> : <i className="fa-solid fa-chevron-down"></i>}
+                </div>
+              </div>
+
+              {isExpanded && (
+                <div className="p-4 md:p-6 pt-2 border-t border-slate-100 bg-slate-50/50">
+                  
+                  <div className="mb-6">
+                    <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                      <i className="fa-solid fa-circle-play text-red-500"></i>
+                      Vídeos da Aula
+                    </h4>
+                    {videos && videos.length > 0 ? (
+                      <div className="space-y-3">
+                        {videos.map(video => {
+                          const isVidCompleted = completedVideoIds.includes(video.id);
+                          return (
+                            <div key={video.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${isVidCompleted ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200 shadow-sm'}`}>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); onToggleVideo(video.id); }}
+                                className={`flex-shrink-0 transition-colors text-xl ${isVidCompleted ? 'text-emerald-500 hover:text-emerald-600' : 'text-slate-300 hover:text-emerald-400'}`}
+                                title={isVidCompleted ? "Desmarcar vídeo" : "Marcar como visto"}
+                              >
+                                {isVidCompleted ? <i className="fa-solid fa-circle-check"></i> : <i className="fa-regular fa-circle"></i>}
+                              </button>
+                              <a 
+                                href={video.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={`flex-1 font-medium hover:text-red-500 flex items-center gap-2 transition-colors ${isVidCompleted ? 'text-slate-500 line-through' : 'text-slate-700'}`}
+                              >
+                                {video.title} <i className="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i>
+                              </a>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                       <div className="bg-slate-200/50 p-4 rounded-xl border border-slate-200 text-slate-500 text-sm flex items-center gap-2 italic">
+                          Nenhum vídeo cadastrado. Use o botão "Adicionar Vídeo" no topo.
+                       </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-6 text-slate-700">
+                    {day.topics && day.topics.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-slate-900 mb-2">{day.intro || "O que você vai aprender:"}</h4>
+                        <ul className="list-disc pl-5 space-y-2">
+                          {day.topics.map((topic, idx) => (
+                            <li key={idx} className="marker:text-emerald-500">{topic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {day.note && (
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div className="flex gap-2 text-blue-800">
+                          <i className="fa-solid fa-circle-exclamation mt-1"></i>
+                          <p className="text-sm font-medium">{day.note}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {day.exercise && (
+                      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                        <h4 className="font-bold text-amber-900 mb-1 flex items-center gap-2">
+                          <i className="fa-solid fa-bullseye text-amber-600"></i>
+                          Mão na Massa
+                        </h4>
+                        <p className="text-amber-800 text-sm">{day.exercise}</p>
+                      </div>
+                    )}
+
+                    {day.quiz && day.quiz.length > 0 && (
+                      <div className="mt-6 border-t border-slate-200 pt-6">
+                        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                          <i className="fa-solid fa-circle-check text-emerald-600"></i>
+                          Teste seus Conhecimentos
+                        </h4>
+                        <div className="space-y-4">
+                          {day.quiz.map((q) => (
+                            <div key={q.id} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                              <label className="block text-sm font-semibold text-slate-800 mb-2">{q.question}</label>
+                              {q.type === 'select' ? (
+                                <select 
+                                  className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 text-slate-700"
+                                  value={localAnswers[q.id] || ''}
+                                  onChange={(e) => setLocalAnswers({...localAnswers, [q.id]: e.target.value})}
+                                >
+                                  <option value="" disabled>Selecione uma opção...</option>
+                                  {q.options.map((opt, i) => (
+                                    <option key={i} value={opt}>{opt}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <textarea 
+                                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-y min-h-[80px] text-slate-700 bg-slate-50"
+                                  placeholder="Escreva sua resposta..."
+                                  value={localAnswers[q.id] || ''}
+                                  onChange={(e) => setLocalAnswers({...localAnswers, [q.id]: e.target.value})}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mt-8 border-t border-slate-200 pt-6">
+                      <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i className="fa-solid fa-pen-nib text-indigo-500"></i>
+                        Seu Caderno de Anotações
+                      </h4>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">O que você entendeu desta aula?</label>
+                          <textarea 
+                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-y min-h-[100px] text-slate-700 bg-white"
+                            placeholder="Resuma os principais aprendizados..."
+                            value={localNotes.understanding}
+                            onChange={(e) => setLocalNotes({...localNotes, understanding: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Ficou com alguma dúvida?</label>
+                          <textarea 
+                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-y min-h-[100px] text-slate-700 bg-white"
+                            placeholder="Anote aqui para pesquisar depois..."
+                            value={localNotes.doubts}
+                            onChange={(e) => setLocalNotes({...localNotes, doubts: e.target.value})}
+                          />
+                        </div>
+
+                        <div className="flex justify-end">
+                          <button 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-50"
+                          >
+                            <i className="fa-solid fa-floppy-disk"></i>
+                            {isSaving ? 'Salvando...' : 'Salvar Respostas e Anotações'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onToggleComplete(); }}
+                        className={`px-6 py-2 rounded-full font-medium transition-colors flex items-center gap-2 ${
+                          isCompleted ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md'
+                        }`}
+                      >
+                        {isCompleted ? 'Desmarcar Conclusão' : 'Marcar Aula como Concluída'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const App = () => {
+          const [completedDays, setCompletedDays] = useState(new Set());
+          const [userNotes, setUserNotes] = useState({});
+          const [userAnswers, setUserAnswers] = useState({});
+          const [activeTab, setActiveTab] = useState('week-1');
+          const [expandedDayId, setExpandedDayId] = useState(null);
+          const [videosByDay, setVideosByDay] = useState({});
+          const [completedVideos, setCompletedVideos] = useState({});
+          const [isSupabaseLoaded, setIsSupabaseLoaded] = useState(false);
+          const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+          const fetchVideosFromDb = async () => {
+            if (!supabase) return;
+            const { data: videosData, error: videosError } = await window.supabase
+              .from('videos')
+              .select('*')
+              .order('created_at', { ascending: true });
+            
+            const vMap = {};
+            if (!videosError && videosData) {
+              videosData.forEach(v => {
+                if (!vMap[v.day_id]) vMap[v.day_id] = [];
+                vMap[v.day_id].push(v);
+              });
+            }
+
+            const localVideos = JSON.parse(localStorage.getItem('investidor_local_videos') || '[]');
+            localVideos.forEach(v => {
+              if (!vMap[v.day_id]) vMap[v.day_id] = [];
+              vMap[v.day_id].push(v);
+            });
+
+            setVideosByDay(vMap);
+          };
+
+          useEffect(() => {
+            const initSupabaseAndData = async () => {
+              if (window.supabase) {
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                setIsSupabaseLoaded(true);
+                
+                await fetchVideosFromDb();
+
+                const { data, error } = await supabase
+                  .from('user_progress')
+                  .select('*')
+                  .eq('user_id', USER_ID);
+
+                if (error) return;
+
+                const completed = new Set();
+                const notesMap = {};
+                const answersMap = {};
+                const completedVidsMap = {};
+
+                if (data) {
+                  data.forEach(row => {
+                    if (row.is_completed) completed.add(row.day_id);
+                    notesMap[row.day_id] = { understanding: row.understanding || '', doubts: row.doubts || '' };
+                    if (row.quiz_answers) answersMap[row.day_id] = row.quiz_answers;
+                    if (row.completed_videos) completedVidsMap[row.day_id] = row.completed_videos;
+                  });
+                }
+
+                setCompletedDays(completed);
+                setUserNotes(notesMap);
+                setUserAnswers(answersMap);
+                setCompletedVideos(completedVidsMap);
+              }
+            };
+            // Pequeno delay para garantir que o script CDN do Supabase carregou
+            setTimeout(initSupabaseAndData, 500); 
+          }, []);
+
+          const saveProgressToDb = async (dayId, updates) => {
+            if (!supabase || !isSupabaseLoaded) return;
+            
+            const currentIsCompleted = completedDays.has(dayId);
+            const currentNotes = userNotes[dayId] || { understanding: '', doubts: '' };
+            const currentAnswers = userAnswers[dayId] || {};
+            const currentVideos = completedVideos[dayId] || [];
+
+            const payload = {
+              user_id: USER_ID,
+              day_id: dayId,
+              is_completed: updates.is_completed !== undefined ? updates.is_completed : currentIsCompleted,
+              understanding: updates.notes ? updates.notes.understanding : currentNotes.understanding,
+              doubts: updates.notes ? updates.notes.doubts : currentNotes.doubts,
+              quiz_answers: updates.answers !== undefined ? updates.answers : currentAnswers,
+              completed_videos: updates.videos !== undefined ? updates.videos : currentVideos,
+              updated_at: new Date().toISOString()
+            };
+
+            await supabase.from('user_progress').upsert(payload, { onConflict: 'user_id, day_id' });
+          };
+
+          const toggleDayCompletion = async (dayId) => {
+            const isCurrentlyCompleted = completedDays.has(dayId);
+            const newStatus = !isCurrentlyCompleted;
+
+            setCompletedDays(prev => {
+              const newSet = new Set(prev);
+              if (newStatus) newSet.add(dayId);
+              else newSet.delete(dayId);
+              return newSet;
+            });
+            await saveProgressToDb(dayId, { is_completed: newStatus });
+          };
+
+          const toggleDayExpansion = (dayId) => setExpandedDayId(prev => prev === dayId ? null : dayId);
+
+          const handleSaveNotes = async (dayId, notes, answers) => {
+            setUserNotes(prev => ({ ...prev, [dayId]: notes }));
+            setUserAnswers(prev => ({ ...prev, [dayId]: answers }));
+            await saveProgressToDb(dayId, { notes, answers });
+          };
+
+          const handleToggleVideo = async (dayId, videoId) => {
+            const dayVids = completedVideos[dayId] || [];
+            const newDayVids = dayVids.includes(videoId) ? dayVids.filter(id => id !== videoId) : [...dayVids, videoId];
+            setCompletedVideos(prev => ({ ...prev, [dayId]: newDayVids }));
+            await saveProgressToDb(dayId, { videos: newDayVids });
+          };
+
+          const handleAddVideo = async (videoData) => {
+            if (!supabase || !isSupabaseLoaded) return;
+            
+            const { error } = await supabase.from('videos').insert([videoData]);
+            
+            if (error) {
+              if (error.code === '42501') {
+                const localVideos = JSON.parse(localStorage.getItem('investidor_local_videos') || '[]');
+                const newVideo = { ...videoData, id: 'local_' + Date.now(), created_at: new Date().toISOString() };
+                localVideos.push(newVideo);
+                localStorage.setItem('investidor_local_videos', JSON.stringify(localVideos));
+                
+                setVideosByDay(prev => ({ ...prev, [videoData.day_id]: [...(prev[videoData.day_id] || []), newVideo] }));
+                alert("Vídeo salvo localmente no seu navegador! (O banco de dados bloqueou o salvamento devido às regras de segurança RLS).");
+                setIsUploadModalOpen(false);
+              } else {
+                alert("Ocorreu um erro ao salvar o vídeo.");
+              }
+            } else {
+              await fetchVideosFromDb();
+              setIsUploadModalOpen(false);
+            }
+          };
+
+          const renderExtrasTab = () => (
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <i className="fa-solid fa-mug-hot text-amber-600"></i>
+                  Rotina Diária (30 min)
+                </h3>
+                <p className="text-slate-500 text-sm mb-4">Faça isso todos os dias para criar familiaridade com o mercado.</p>
+                <ul className="space-y-3">
+                  {COURSE_DATA.routine.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
+                      <i className="fa-solid fa-circle-check text-slate-300 mt-1"></i>
+                      <span className="text-slate-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="space-y-8">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i className="fa-solid fa-book-open text-blue-600"></i>
+                    Leitura Recomendada
+                  </h3>
+                  <div className="space-y-4">
+                    {COURSE_DATA.books.map((book, idx) => (
+                      <div key={idx} className="flex flex-col border-l-4 border-blue-200 pl-4 py-1">
+                        <span className="font-bold text-slate-800">{book.title}</span>
+                        <span className="text-sm text-slate-500">{book.author}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-emerald-600 to-teal-800 p-6 rounded-2xl shadow-md text-white">
+                  <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <i className="fa-solid fa-trophy text-yellow-400"></i>
+                    O Desafio de 30 Dias
+                  </h3>
+                  <p className="text-emerald-50 leading-relaxed font-medium">{COURSE_DATA.challenge}</p>
+                </div>
+              </div>
+            </div>
+          );
+
+          return (
+            <div>
+              <Header completedCount={completedDays.size} totalCount={30} onOpenUpload={() => setIsUploadModalOpen(true)} />
+              <main className="max-w-5xl mx-auto px-4">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 mb-8 flex overflow-x-auto hide-scrollbar">
+                  {COURSE_DATA.weeks.map(week => (
+                    <button
+                      key={`nav-${week.id}`}
+                      onClick={() => setActiveTab(`week-${week.id}`)}
+                      className={`flex-1 min-w-[120px] py-3 px-4 rounded-xl text-sm font-bold text-center transition-all whitespace-nowrap ${
+                        activeTab === `week-${week.id}` ? 'bg-emerald-100 text-emerald-800 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                      }`}
+                    >
+                      Semana {week.id}
+                    </button>
+                  ))}
+                  <button
+                     onClick={() => setActiveTab('extras')}
+                     className={`flex-1 min-w-[120px] py-3 px-4 rounded-xl text-sm font-bold text-center transition-all whitespace-nowrap ${
+                       activeTab === 'extras' ? 'bg-blue-100 text-blue-800 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                     }`}
+                  >
+                    Rotina & Extras
+                  </button>
+                </div>
+
+                <div>
+                  {COURSE_DATA.weeks.map(week => (
+                    activeTab === `week-${week.id}` && (
+                      <div key={week.id}>
+                        <div className="mb-6 px-2">
+                          <h2 className="text-2xl font-bold text-slate-800">{week.title}</h2>
+                          <p className="text-slate-500 font-medium mt-1">{week.objective}</p>
+                        </div>
+                        <div className="space-y-4">
+                          {week.days.map(day => (
+                            <DayCard 
+                              key={day.id} day={day} isCompleted={completedDays.has(day.id)}
+                              onToggleComplete={() => toggleDayCompletion(day.id)}
+                              isExpanded={expandedDayId === day.id} onToggleExpand={() => toggleDayExpansion(day.id)}
+                              notes={userNotes[day.id] || { understanding: '', doubts: '' }}
+                              savedAnswers={userAnswers[day.id] || {}}
+                              onSaveNotes={(notes, answers) => handleSaveNotes(day.id, notes, answers)}
+                              isSupabaseReady={isSupabaseLoaded} videos={videosByDay[day.id] || []}
+                              completedVideoIds={completedVideos[day.id] || []} onToggleVideo={(videoId) => handleToggleVideo(day.id, videoId)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  ))}
+                  {activeTab === 'extras' && renderExtrasTab()}
+                </div>
+              </main>
+
+              <VideoUploadModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} onSave={handleAddVideo} />
+            </div>
+          );
+        };
+
+        // Renderização final
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
