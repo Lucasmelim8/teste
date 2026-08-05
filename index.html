@@ -108,8 +108,36 @@
                 { 
                   id: 7, 
                   title: "Revisão da Semana 1", 
-                  topics: ["Revisão completa dos conceitos aprendidos."],
-                  note: "Tire o dia para reler suas anotações e garantir que entendeu o vocabulário básico."
+                  topics: ["Avaliação de conhecimento e fixação."],
+                  note: "Tire o dia para testar seus conhecimentos e garantir que entendeu o vocabulário básico antes de avançar.",
+                  mindMap: "SEMANA 1\n\nEconomia\n│\n├── Selic\n├── CDI\n└── IPCA\n\n↓\n\nInvestimentos\n│\n├── Rentabilidade\n├── Liquidez\n└── Risco\n\n↓\n\nSistema Financeiro\n│\n├── Banco Central\n├── CVM\n├── B3\n└── Corretoras\n\n↓\n\nInvestimento\n│\n├── Compra\n├── Custódia\n└── Venda\n\n↓\n\nImpostos\n├── IR\n└── IOF",
+                  checklist: [
+                    "Sei o que é Selic.",
+                    "Sei o que é CDI.",
+                    "Sei o que é IPCA.",
+                    "Sei a diferença entre juros simples e compostos.",
+                    "Sei explicar risco, liquidez e rentabilidade.",
+                    "Sei o papel da corretora.",
+                    "Sei quem é a B3.",
+                    "Sei quando pago imposto."
+                  ],
+                  quiz: [
+                    { id: 'd7q1', type: 'radio', question: '1. Qual indicador mede a inflação oficial do Brasil?', options: ['CDI', 'Selic', 'IPCA', 'Ibovespa'], answer: 'IPCA' },
+                    { id: 'd7q2', type: 'radio', question: '2. O que significa liquidez?', options: ['Rentabilidade do ativo', 'Facilidade de transformar investimento em dinheiro', 'Segurança total do investimento', 'Taxa de juros anual'], answer: 'Facilidade de transformar investimento em dinheiro' },
+                    { id: 'd7q3', type: 'radio', question: '3. Quem regula e fiscaliza o mercado de capitais no Brasil?', options: ['Banco do Brasil', 'Caixa Econômica', 'CVM', 'Receita Federal'], answer: 'CVM' },
+                    { id: 'd7q4', type: 'radio', question: '4. Qual instituição guarda o registro das ações e investimentos?', options: ['Banco Central', 'B3', 'Receita Federal', 'Corretora'], answer: 'B3' },
+                    { id: 'd7q5', type: 'radio', question: '5. Qual é a taxa básica de juros da economia brasileira?', options: ['CDI', 'IPCA', 'Selic', 'TR'], answer: 'Selic' },
+                    { id: 'd7q6', type: 'radio', question: '6. O CDI costuma andar muito próximo de qual outra taxa?', options: ['IPCA', 'Poupança', 'Inflação', 'Selic'], answer: 'Selic' },
+                    { id: 'd7q7', type: 'radio', question: '7. Juros compostos são aqueles que:', options: ['Rendem apenas sobre o valor inicial', 'Rendem sobre o valor inicial mais os juros passados (juros sobre juros)', 'São cobrados apenas em dívidas', 'Não existem nos investimentos'], answer: 'Rendem sobre o valor inicial mais os juros passados (juros sobre juros)' },
+                    { id: 'd7q8', type: 'radio', question: '8. Verdadeiro ou Falso: A Selic influencia todas as outras taxas de juros da economia.', options: ['Verdadeiro', 'Falso'], answer: 'Verdadeiro' },
+                    { id: 'd7q9', type: 'radio', question: '9. Verdadeiro ou Falso: O dinheiro que você investe fica "guardado" dentro da corretora.', options: ['Verdadeiro', 'Falso'], answer: 'Falso' },
+                    { id: 'd7q10', type: 'radio', question: '10. Verdadeiro ou Falso: Todo e qualquer investimento possui algum nível de risco.', options: ['Verdadeiro', 'Falso'], answer: 'Verdadeiro' },
+                    { id: 'd7q11', type: 'radio', question: '11. Verdadeiro ou Falso: Quanto maior a rentabilidade prometida, maior tende a ser o risco.', options: ['Verdadeiro', 'Falso'], answer: 'Verdadeiro' },
+                    { id: 'd7q12', type: 'radio', question: '12. Qual é a sequência correta do fluxo de um investimento?', options: ['Você → Mercado → Ativo → Corretora', 'Você → Corretora → Mercado → Ativo', 'Corretora → Você → Mercado → Ativo', 'Você → Ativo → Mercado → Corretora'], answer: 'Você → Corretora → Mercado → Ativo' },
+                    { id: 'd7q13', type: 'radio', question: '13. O Imposto de Renda sobre investimentos geralmente é cobrado sobre:', options: ['O valor total investido', 'Apenas sobre o lucro (rendimento)', 'Sempre 27,5% fixo', 'Nunca é cobrado'], answer: 'Apenas sobre o lucro (rendimento)' },
+                    { id: 'd7q14', type: 'radio', question: '14. Verdadeiro ou Falso: O IOF é cobrado caso você resgate um investimento APÓS 30 dias.', options: ['Verdadeiro', 'Falso'], answer: 'Falso' }
+                  ],
+                  finalChallenge: "Imagine que um amigo nunca investiu. Explique, em até 10 linhas, como ele investiria R$ 1.000, desde a abertura da conta em uma corretora até a compra de um investimento, citando os principais conceitos aprendidos nesta semana."
                 }
               ]
             },
@@ -367,6 +395,7 @@
           const [localNotes, setLocalNotes] = useState({ understanding: '', doubts: '' });
           const [localAnswers, setLocalAnswers] = useState({});
           const [isSaving, setIsSaving] = useState(false);
+          const [showResults, setShowResults] = useState(false);
 
           useEffect(() => {
             if (notes) setLocalNotes({ understanding: notes.understanding || '', doubts: notes.doubts || '' });
@@ -378,6 +407,17 @@
             await onSaveNotes(localNotes, localAnswers);
             setIsSaving(false);
           };
+
+          // Lógica de Gamificação do Quiz
+          const calculableQuestions = day.quiz ? day.quiz.filter(q => q.answer) : [];
+          const totalQuestions = calculableQuestions.length;
+          let correctCount = 0;
+          if (totalQuestions > 0) {
+            calculableQuestions.forEach(q => {
+               if (localAnswers[q.id] === q.answer) correctCount++;
+            });
+          }
+          const scorePercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
           return (
             <div className={`border rounded-xl mb-4 overflow-hidden transition-all duration-300 ${isCompleted ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-white shadow-sm'}`}>
@@ -440,12 +480,24 @@
                       </div>
                     ) : (
                        <div className="bg-slate-200/50 p-4 rounded-xl border border-slate-200 text-slate-500 text-sm flex items-center gap-2 italic">
-                          Nenhum vídeo cadastrado.
+                          Nenhum vídeo cadastrado. Use o botão "Adicionar Vídeo" no topo.
                        </div>
                     )}
                   </div>
 
                   <div className="space-y-6 text-slate-700">
+                    
+                    {day.mindMap && (
+                      <div className="bg-slate-900 rounded-xl p-4 shadow-inner overflow-hidden mb-6">
+                        <h4 className="text-emerald-400 font-bold mb-3 flex items-center gap-2 border-b border-slate-700 pb-2">
+                          <i className="fa-solid fa-sitemap"></i> Mapa Mental
+                        </h4>
+                        <pre className="font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto whitespace-pre">
+                          {day.mindMap}
+                        </pre>
+                      </div>
+                    )}
+
                     {day.topics && day.topics.length > 0 && (
                       <div>
                         <h4 className="font-semibold text-slate-900 mb-2">{day.intro || "O que você vai aprender:"}</h4>
@@ -466,27 +518,39 @@
                       </div>
                     )}
 
-                    {day.exercise && (
-                      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                        <h4 className="font-bold text-amber-900 mb-1 flex items-center gap-2">
-                          <i className="fa-solid fa-bullseye text-amber-600"></i>
-                          Mão na Massa
+                    {day.checklist && (
+                      <div className="mt-6 border-t border-slate-200 pt-6">
+                        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                          <i className="fa-solid fa-list-check text-blue-500"></i> Checklist de Domínio
                         </h4>
-                        <p className="text-amber-800 text-sm">{day.exercise}</p>
+                        <div className="space-y-3">
+                          {day.checklist.map((item, idx) => (
+                            <label key={idx} className="flex items-center gap-3 cursor-pointer p-3 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                              <input 
+                                type="checkbox" 
+                                className="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                                checked={localAnswers[`chk_${idx}`] || false}
+                                onChange={(e) => setLocalAnswers({...localAnswers, [`chk_${idx}`]: e.target.checked})}
+                              />
+                              <span className="text-slate-700 font-medium">{item}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                     )}
 
                     {day.quiz && day.quiz.length > 0 && (
                       <div className="mt-6 border-t border-slate-200 pt-6">
                         <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                          <i className="fa-solid fa-circle-check text-emerald-600"></i>
+                          <i className="fa-solid fa-circle-question text-emerald-600"></i>
                           Teste seus Conhecimentos
                         </h4>
                         <div className="space-y-4">
                           {day.quiz.map((q) => (
                             <div key={q.id} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
                               <label className="block text-sm font-semibold text-slate-800 mb-2">{q.question}</label>
-                              {q.type === 'select' ? (
+                              
+                              {q.type === 'select' && (
                                 <select 
                                   className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 text-slate-700"
                                   value={localAnswers[q.id] || ''}
@@ -497,7 +561,27 @@
                                     <option key={i} value={opt}>{opt}</option>
                                   ))}
                                 </select>
-                              ) : (
+                              )}
+
+                              {q.type === 'radio' && (
+                                <div className="space-y-2 mt-2">
+                                  {q.options.map((opt, i) => (
+                                    <label key={i} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${localAnswers[q.id] === opt ? 'bg-emerald-50 border-emerald-400' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
+                                      <input 
+                                        type="radio" 
+                                        name={`quiz_${q.id}`}
+                                        value={opt}
+                                        checked={localAnswers[q.id] === opt}
+                                        onChange={(e) => setLocalAnswers({...localAnswers, [q.id]: e.target.value})}
+                                        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                      />
+                                      <span className="text-slate-700">{opt}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              )}
+
+                              {q.type === 'text' && (
                                 <textarea 
                                   className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-y min-h-[80px] text-slate-700 bg-slate-50"
                                   placeholder="Escreva sua resposta..."
@@ -507,6 +591,57 @@
                               )}
                             </div>
                           ))}
+                        </div>
+
+                        {/* Gamificação de Resultados */}
+                        {totalQuestions > 0 && (
+                          <div className="mt-6 p-5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col items-center">
+                            {!showResults ? (
+                              <button 
+                                onClick={() => setShowResults(true)}
+                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors flex items-center gap-2"
+                              >
+                                <i className="fa-solid fa-ranking-star"></i> Verificar Pontuação
+                              </button>
+                            ) : (
+                              <div className={`w-full p-6 rounded-xl border-2 text-center shadow-sm ${
+                                scorePercentage >= 90 ? 'bg-green-50 border-green-400 text-green-900' : 
+                                scorePercentage >= 70 ? 'bg-yellow-50 border-yellow-400 text-yellow-900' : 
+                                'bg-red-50 border-red-400 text-red-900'
+                              }`}>
+                                <h3 className="text-2xl font-bold mb-2">Nota: {correctCount}/{totalQuestions} ({scorePercentage}%)</h3>
+                                <p className="font-medium text-lg mt-2">
+                                  {scorePercentage >= 90 ? '🟢 Excelente! Você está pronto para avançar.' : 
+                                  scorePercentage >= 70 ? '🟡 Bom trabalho. Mas revise os pontos com dificuldade.' : 
+                                  '🔴 Refaça as aulas antes de seguir para a próxima semana.'}
+                                </p>
+                                <button 
+                                  onClick={() => setShowResults(false)}
+                                  className="mt-4 text-sm underline opacity-70 hover:opacity-100"
+                                >
+                                  Ocultar resultado
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {day.finalChallenge && (
+                      <div className="mt-8 border-t border-slate-200 pt-6">
+                        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                          <i className="fa-solid fa-trophy text-yellow-500 text-xl"></i> 
+                          Desafio Final da Semana
+                        </h4>
+                        <div className="bg-amber-50 border border-amber-200 p-5 rounded-xl shadow-sm">
+                          <p className="text-amber-900 font-medium mb-4">{day.finalChallenge}</p>
+                          <textarea 
+                            className="w-full p-4 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-all resize-y min-h-[120px] text-slate-700 bg-white shadow-inner"
+                            placeholder="Escreva sua explicação aqui..."
+                            value={localAnswers['finalChallenge'] || ''}
+                            onChange={(e) => setLocalAnswers({...localAnswers, 'finalChallenge': e.target.value})}
+                          />
                         </div>
                       </div>
                     )}
